@@ -1,0 +1,286 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Pawan Pawar
+
+
+* Introduction
+I'm Trying to learn emacs as my primary code /text editor.. keeping all my configuration in 
+Org file is just awesome. 
+* Personal Information
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Pawankumar Pawar"
+        user-email-address "pawanpawar@gmail.com")
+#+END_SRC
+
+* Customize settings
+
+Setup the customize file to its own separate file, instead of saving customize settings in init.el
+
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (expand-file-name ".custom.el" user-emacs-directory))
+  (load custom-file)
+  (defvar init-dir "~/.emacs.d/")
+#+END_SRC
+
+* Installing use-package
+
+This is taken from [[https://gitlab.com/buildfunthings/emacs-config/blob/master/loader.org][Build Fun Things emacs config]]
+
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+
+  (defvar gnu '("gnu" . "http://elpa.gnu.org/packages/"))
+  (defvar melpa '("melpa" . "http://melpa.org/packages/"))
+  (defvar melpa-stable '("melpa-stable" . "http://stable.melpa.org/packages/"))
+  (defvar org-elpa '("org" . "http://orgmode.org/elpa/"))
+
+  ;; add to package repo list
+
+  (setq package-archives nil)
+  (add-to-list 'package-archives melpa-stable t)
+  (add-to-list 'package-archives melpa t)
+  (add-to-list 'package-archives gnu t)
+  (add-to-list 'package-archives org-elpa t)
+
+  (package-initialize)
+
+  (unless (and (file-exists-p (concat init-dir  "elpa/archives/gnu"))
+               (file-exists-p (concat init-dir  "elpa/archives/melpa"))
+               (file-exists-p (concat init-dir  "elpa/archives/melpa-stable")))
+    (package-refresh-contents))
+
+  (defun packages-install (&rest packages)
+    (message "running packages-install")
+    (mapc (lambda (package)
+            (let ((name (car package))
+                  (repo (cdr package)))
+              (when (not (package-installed-p name))
+                (let ((package-archives (list repo)))
+                  (package-initialize)
+                  (package-install name)))))
+          packages)
+    (package-initialize)
+    (delete-other-windows))
+
+  ;; Install extensions if they're missing
+  (defun init--install-packages ()
+    (message "Lets install some packages")
+    (packages-install
+     ;; Since use-package this is the only entry here
+     ;; ALWAYS try to use use-package!
+     (cons 'use-package melpa)
+     ))
+
+  (condition-case nil
+      (init--install-packages)
+    (error
+     (package-refresh-contents)
+     (init--install-packages)))
+#+END_SRC
+* General Configuration
+
+** Backups
+
+Taking care of lots of backup files littered in all of your directories
+
+#+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+
+  (setq delete-old-version t)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+
+#+END_SRC
+
+** Time in the modeline
+ 
+I also like to have time in the mode line .. Got this from Sacha Chua
+
+#+BEGIN_SRC emacs-lisp
+(display-time-mode 1)
+#+END_SRC
+
+** Mode line format
+
+Smart mode line
+
+#+BEGIN_SRC emacs-lisp
+(use-package smart-mode-line
+    :ensure t
+    :init)
+#+END_SRC
+
+* Clean the default emacs look
+
+Disable menu bar tool bars etc.. basically to give more real estate on the emacs.. remove the clutter
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (tooltip-mode -1))
+
+  ;; Blinking cursor no more
+  (blink-cursor-mode -1)
+
+  ;; Disable annoying ring bell
+  (setq ring-bell-function 'ignore)
+
+  ;; Disable startup screen
+  (setq inhibit-startup-screen t)
+
+  ;; Delete the selection on keypress
+  (delete-selection-mode t)
+#+END_SRC
+
+* Remap mac keys for avoiding emacs pinky
+
+ Remapping some keys on the keyboard and some bindings inspired by steve yegge.
+
+#+BEGIN_SRC emacs-lisp
+(when (eq system-type 'darwin)
+   (setq mac-option-modifier 'alt)
+   (setq mac-command-modifier 'meta)
+   (global-set-key [kp-delete] 'delete-char))
+
+(global-set-key "\C-x\C-m" 'execute-extended-command)
+
+#+END_SRC
+* Themes
+** Monokai theme
+#+BEGIN_SRC emacs-lisp
+  (use-package monokai-theme
+       :if (window-system)
+       :ensure t
+       :init
+       (setq monokai-use-variable-pitch nil))
+#+END_SRC
+   
+* Org Mode
+
+#+BEGIN_SRC emacs-lisp
+(require 'org)
+(require 'ob)
+
+#+END_SRC
+** Org languages support
+Add supported lanaguages for highlighting
+#+BEGIN_SRC emacs-lisp
+  ;; Make org mode allow eval of some langs
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (ruby . t)))
+#+END_SRC
+** Org Mode key-bindings
+#+BEGIN_SRC emacs-lisp
+  (bind-key "C-c l" 'org-store-link)
+  (bind-key "C-c c" 'org-capture)
+  (bind-key "C-c a" 'org-agenda)
+#+END_SRC
+
+#+RESULTS:
+: org-agenda
+
+** Taking Notes
+#+BEGIN_SRC emacs-lisp
+  (setq org-directory "~/personal")
+  (setq org-default-notes-file "~/personal/organizer.org")
+#+END_SRC
+** Org Agenda settings
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files '("~/personal/inbox.org"
+                           "~/personal/gtd.org"
+                           "~/personal/tickler.org"))
+#+END_SRC
+** Private templates for org capture
+Few templates to setup a GTD system
+#+BEGIN_SRC emacs-lisp
+  (custom-set-variables
+   '(org-capture-templates
+     (quote (
+             ("j" "Journal Entry" entry
+              (file+datetree "~/personal/journal.org") "** %U - %^{Activity} :LOG:")
+             ("t" "Todo [inbox]" entry (file+headline "~/personal/inbox.org" "Tasks")
+              (file "~/.org/templates/todo_tmplt.txt") :emtpy-lines-before 1)
+             ("T" "Tickler" entry (file+headline "~/personal/tickler.org" "tickler")
+              "* %i%? \n %U")))))
+
+#+END_SRC
+** Org Refile settings
+Refiling settings for the tasks from inbox
+#+BEGIN_SRC emacs-lisp
+  (setq org-refile-targets '(("~/personal/gtd.org" :maxlevel . 3)
+                             ("~/personal/someday.org" :level . 1)
+                             ("~/personal/tickler.org" :maxlevel . 2)))
+
+#+END_SRC
+* Better Defaults 
+Emacs asks you to type the whole yes / no words.. this changes it to just y or n
+#+BEGIN_SRC emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (global-set-key (kbd "M-/") 'hippie-expand)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (global-set-key (kbd "M-z") 'zap-up-to-char)
+  (show-paren-mode 1)
+#+END_SRC
+* UTF-8
+
+Set UTF-8 for everything
+#+BEGIN_SRC emacs-lisp
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+#+END_SRC
+* Look and feel
+Set proper font and size. 
+** Mode Line Enhancements
+
+** setup helm mode for better completions.
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure t
+    :bind (("M-x" . helm-M-x)
+           ("C-x C-f" . helm-find-files)
+           ("C-x f" . helm-recentf)
+           ("C-SPC" . helm-dabbrev)
+           ("M-y" . helm-show-kill-ring)
+           ("C-x b" . helm-buffers-list))
+    :bind (:map helm-map
+                ("M-i" . helm-previous-line)
+                ("M-k" . helm-next-line)
+                ("M-I" . helm-previous-page)
+                ("M-K" . helm-next-page)
+                ("M-h" . helm-beginning-of-buffer)
+                ("M-H" . helm-end-of-buffer))
+    :config (progn
+              (setq helm-buffers-fuzzy-matching t)
+              (helm-mode 1)))
+#+END_SRC
+
+* Utilities
+** Magit
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :ensure t
+  :defer 2
+  :bind (("C-x g" . magit-status)))
+#+END_SRC
+* Discover-ability
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
+#+END_SRC
+* Fun Stuff
+** Nyan Cat mode
+#+BEGIN_SRC emacs-lisp
+  (use-package nyan-mode
+    :ensure t
+    :config
+    (nyan-mode))
+#+END_SRC
