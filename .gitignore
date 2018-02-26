@@ -50,3 +50,7 @@ site-lisp/package/
 /rake.cache
 /plantuml.jar
 /magithub
+Configuration.el
+Configuration.html
+smex*
+bookmark*
