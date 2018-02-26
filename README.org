@@ -1,2 +1,2 @@
-# .emacs.d
+#+TITLE: My GNU Emacs configuration
 My Emacs configuration
