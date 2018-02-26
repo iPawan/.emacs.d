@@ -1,2 +1,2 @@
 #+TITLE: My GNU Emacs configuration
-My Emacs configuration
+My Emacs [[file:configuration.org][Configuration]]
