@@ -150,11 +150,16 @@ Disable menu bar tool bars etc.. basically to give more real estate on the emacs
 * Themes
 ** Monokai theme
 #+BEGIN_SRC emacs-lisp
-  (use-package monokai-theme
-       :if (window-system)
-       :ensure t
-       :init
-       (setq monokai-use-variable-pitch nil))
+;;  (use-package monokai-theme
+;;     :if (window-system)
+;;     :ensure t
+;;     :init
+;;     (setq monokai-use-variable-pitch nil))
+  (use-package zenburn-theme
+    :if (window-system)
+    :ensure t
+    :config
+    (load-theme 'zenburn t))
 #+END_SRC
    
 * Org Mode
@@ -237,6 +242,16 @@ Set UTF-8 for everything
 #+END_SRC
 * Look and feel
 Set proper font and size. 
+** Font Size
+#+BEGIN_SRC emacs-lisp
+;; Set default font
+(set-face-attribute 'default nil
+                    :family "Source Code Pro"
+                    :height 140
+                    :weight 'normal
+                    :width 'normal)
+(setq org-src-fontify-natively t)
+#+END_SRC
 ** Mode Line Enhancements
 
 ** setup helm mode for better completions.

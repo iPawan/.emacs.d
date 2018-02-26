@@ -12,7 +12,7 @@
       (file+datetree "~/personal/journal.org")
       "** %U - %^{Activity} :LOG:")
      ("t" "Todo [inbox]" entry
-      (file+headline "~/personal/inbox.org" "capture")
+      (file+headline "~/personal/inbox.org" "Tasks")
       (file "~/.org/templates/todo_tmplt.txt")
       :emtpy-lines-before 1)
      ("T" "Tickler" entry
@@ -21,7 +21,7 @@
  %U"))))
  '(package-selected-packages
    (quote
-    (nyan-mode magit helm mode-icons which-key smart-mode-line org-plus-contrib use-package monokai-theme smex))))
+    (zenburn-theme nyan-mode magit helm mode-icons which-key smart-mode-line org-plus-contrib use-package monokai-theme smex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
