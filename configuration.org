@@ -311,7 +311,7 @@ Set UTF-8 for everything
 #+END_SRC
 ** setup ibuffer
 #+BEGIN_SRC emacs-lisp
-  (defalias 'list-buffers 'ibuffer-other-window)
+  (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 #+END_SRC
 
 * Search / Find
