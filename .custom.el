@@ -21,7 +21,7 @@
  %U"))))
  '(package-selected-packages
    (quote
-    (zenburn-theme nyan-mode magit helm mode-icons which-key smart-mode-line org-plus-contrib use-package monokai-theme smex))))
+    (counsel avy htmlize ox-reveal org-reveal zenburn-theme nyan-mode magit helm mode-icons which-key smart-mode-line org-plus-contrib use-package monokai-theme smex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
